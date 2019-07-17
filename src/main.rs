@@ -38,6 +38,10 @@ enum Command {
         /// Trashes directories recursively
         #[structopt(long = "recursive", short = "r")]
         recursive: bool,
+
+        /// -f to stay compatible with GNU rm
+        #[structopt(long = "force", short = "f")]
+        force: bool,
     },
 
     #[structopt(name = "restore")]
