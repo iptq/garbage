@@ -69,7 +69,7 @@ fn main() {
                 println!("{}\t{}", info.deletion_date, info.path.to_str().unwrap());
             }
         }
-        Command::Put { paths, recursive } => {
+        Command::Put { paths, recursive, .. } => {
             for path in paths {
                 match crate::ops::put(path, recursive) {
                     Ok(_) => (),
