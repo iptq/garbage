@@ -31,22 +31,19 @@ impl TrashDir {
         Ok(target)
     }
 
-    pub fn iter(&self) -> TrashDirIter {
-        let iter = WalkDir::new(&self.0.join("info"))
-        .contents_first(true)
+    pub fn iter(&self) -> Result<TrashDirIter, Error> {
+        let iter = WalkDir::new(&self.info_dir()?)
+            .contents_first(true)
             .into_iter()
-            .filter_entry(|entry| {
-                // warn!("path: {:?}", entry.path());
-                match entry.path().extension() {
-                    Some(x) => x == "trashinfo",
-                    _ => false,
-                }
+            .filter_entry(|entry| match entry.path().extension() {
+                Some(x) => x == "trashinfo",
+                _ => false,
             });
-        TrashDirIter(Box::new(iter))
+        Ok(TrashDirIter(self.0.clone(), Box::new(iter)))
     }
 }
 
-pub struct TrashDirIter(Box<Iterator<Item = walkdir::Result<DirEntry>>>);
+pub struct TrashDirIter(PathBuf, Box<Iterator<Item = walkdir::Result<DirEntry>>>);
 
 impl Iterator for TrashDirIter {
     type Item = Result<TrashInfo, Error>;
@@ -55,7 +52,7 @@ impl Iterator for TrashDirIter {
         let entry = {
             let mut entry;
             loop {
-                entry = match self.0.next() {
+                entry = match self.1.next() {
                     Some(Ok(entry)) => entry,
                     Some(Err(err)) => return Some(Err(Error::from(err))),
                     None => return None,
@@ -68,6 +65,8 @@ impl Iterator for TrashDirIter {
             entry
         };
 
-        Some(TrashInfo::from_file(entry.path()).map_err(Error::from))
+        let name = entry.path().file_name().unwrap();
+        let deleted_path = self.0.join("files").join(name);
+        Some(TrashInfo::from_files(entry.path(), deleted_path).map_err(Error::from))
     }
 }

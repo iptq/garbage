@@ -283,7 +283,7 @@ dependencies = [
 
 [[package]]
 name = "trash"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono 0.4.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",

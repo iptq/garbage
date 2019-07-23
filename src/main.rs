@@ -24,7 +24,16 @@ lazy_static! {
 #[derive(StructOpt)]
 enum Command {
     #[structopt(name = "empty")]
-    Empty,
+    Empty {
+        /// Only list the files that are to be deleted, without
+        /// actually deleting anything.
+        #[structopt(long = "dry")]
+        dry: bool,
+
+        /// Delete all files older than (this number) of days.
+        /// Removes everything if this option is not specified
+        days: Option<u32>,
+    },
 
     #[structopt(name = "list")]
     List,
@@ -53,12 +62,13 @@ fn main() {
 
     let cmd = Command::from_args();
     match cmd {
-        Command::Empty => {
-            println!("TODO");
-        }
+        Command::Empty { dry, days } => match crate::ops::empty(dry, days) {
+            Ok(_) => (),
+            Err(err) => error!("error: {:?}", err),
+        },
         Command::List => {
             let home_trash = TrashDir::get_home_trash();
-            for info in home_trash.iter() {
+            for info in home_trash.iter().unwrap() {
                 let info = match info {
                     Ok(info) => info,
                     Err(err) => {
@@ -69,7 +79,9 @@ fn main() {
                 println!("{}\t{}", info.deletion_date, info.path.to_str().unwrap());
             }
         }
-        Command::Put { paths, recursive, .. } => {
+        Command::Put {
+            paths, recursive, ..
+        } => {
             for path in paths {
                 match crate::ops::put(path, recursive) {
                     Ok(_) => (),
@@ -81,6 +93,7 @@ fn main() {
             let home_trash = TrashDir::get_home_trash();
             let files = home_trash
                 .iter()
+                .unwrap()
                 .filter_map(|entry| match entry {
                     Ok(info) => Some(info),
                     Err(err) => {

@@ -15,6 +15,8 @@ $ trash restore
 [..interactive]
 
 $ trash list
+
+$ trash empty [days]
 ```
 
 About

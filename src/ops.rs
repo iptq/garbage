@@ -1,11 +1,43 @@
 use std::fs::{self, File};
 use std::path::Path;
 
-use chrono::Local;
+use chrono::{Duration, Local};
 
 use crate::errors::Error;
 use crate::trashdir::TrashDir;
 use crate::trashinfo::TrashInfo;
+
+pub fn empty(dry: bool, days: Option<u32>) -> Result<(), Error> {
+    let home_trash = TrashDir::get_home_trash();
+    let files_dir = home_trash.files_dir()?;
+    let info_dir = home_trash.info_dir()?;
+
+    let cutoff = if let Some(days) = days {
+        Local::now() - Duration::days(days.into())
+    } else {
+        Local::now()
+    };
+    for file in home_trash.iter()? {
+        let file = file?;
+
+        let mut ignore = false;
+        // ignore files that were deleted after the cutoff (younger)
+        if file.deletion_date > cutoff {
+            ignore = true;
+        }
+
+        if !ignore {
+            if dry {
+                println!("{:?}", file.path);
+            } else {
+                fs::remove_file(file.info_path)?;
+                fs::remove_file(file.deleted_path)?;
+            }
+        }
+    }
+
+    Ok(())
+}
 
 pub fn put(path: impl AsRef<Path>, recursive: bool) -> Result<(), Error> {
     let path = path.as_ref().canonicalize()?;
@@ -31,6 +63,7 @@ pub fn put(path: impl AsRef<Path>, recursive: bool) -> Result<(), Error> {
         path: path.clone(),
         deletion_date: now,
         deleted_path: trash_file_path.clone(),
+        info_path: trash_info_path.clone(),
     };
     {
         let trash_info_file = File::create(trash_info_path)?;

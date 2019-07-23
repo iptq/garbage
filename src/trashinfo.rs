@@ -15,15 +15,24 @@ const DATE_FORMAT: &str = "%Y-%m-%dT%H:%M:%S";
 
 #[derive(Debug)]
 pub struct TrashInfo {
+    /// The original path where this file was located before it was deleted.
     pub path: PathBuf,
     pub deletion_date: DateTime<Local>,
+
+    /// The location of the deleted file after deletion.
     pub deleted_path: PathBuf,
+    /// The location of the `info` description file.
+    pub info_path: PathBuf,
 }
 
 impl TrashInfo {
-    pub fn from_file(path: impl AsRef<Path>) -> Result<Self, Error> {
-        let path = path.as_ref();
-        let original_path = path.to_path_buf();
+    pub fn from_files(
+        info_path: impl AsRef<Path>,
+        deleted_path: impl AsRef<Path>,
+    ) -> Result<Self, Error> {
+        let path = info_path.as_ref();
+        let info_path = path.to_path_buf();
+        let deleted_path = deleted_path.as_ref().to_path_buf();
         let file = File::open(path)?;
         let reader = BufReader::new(file);
 
@@ -74,7 +83,8 @@ impl TrashInfo {
         Ok(TrashInfo {
             path,
             deletion_date,
-            deleted_path: original_path,
+            deleted_path,
+            info_path,
         })
     }
 
