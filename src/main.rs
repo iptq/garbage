@@ -113,12 +113,13 @@ fn main() {
 
             let stdin = io::stdin();
             let mut s = String::new();
-            println!("which file to restore? [0..{}]", files.len());
+            println!("which file to restore? [0..{}]", files.len() - 1);
             stdin.read_line(&mut s).unwrap();
 
             match s.trim_end().parse::<usize>() {
                 Ok(i) if i < files.len() => {
                     let info = files.get(i).unwrap();
+                    println!("moving {:?} to {:?}", &info.deleted_path, &info.path);
                     fs::rename(&info.deleted_path, &info.path);
                 }
                 _ => println!("Invalid number."),

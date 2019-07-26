@@ -65,8 +65,12 @@ impl Iterator for TrashDirIter {
             entry
         };
 
-        let name = entry.path().file_name().unwrap();
-        let deleted_path = self.0.join("files").join(name);
+        let name = entry.path().file_name().unwrap().to_str().unwrap();
+        let deleted_path = if !name.ends_with(".trashinfo") {
+            return self.next();
+        } else {
+            self.0.join("files").join(name.trim_right_matches(".trashinfo"))
+        };
         Some(TrashInfo::from_files(entry.path(), deleted_path).map_err(Error::from))
     }
 }

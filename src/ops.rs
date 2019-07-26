@@ -51,13 +51,13 @@ pub fn put(path: impl AsRef<Path>, recursive: bool) -> Result<(), Error> {
 
     let home_trash = TrashDir::get_home_trash();
     let file_name = format!(
-        "{}.{}.trashinfo",
+        "{}.{}",
         elapsed,
         path.file_name().unwrap().to_str().unwrap()
     );
 
     let trash_file_path = home_trash.files_dir()?.join(&file_name);
-    let trash_info_path = home_trash.info_dir()?.join(&file_name);
+    let trash_info_path = home_trash.info_dir()?.join(file_name + ".trashinfo");
 
     let trash_info = TrashInfo {
         path: path.clone(),
