@@ -15,6 +15,7 @@ use std::path::PathBuf;
 use structopt::StructOpt;
 use xdg::BaseDirectories;
 
+use crate::errors::Error;
 use crate::trashdir::TrashDir;
 
 lazy_static! {
@@ -50,14 +51,14 @@ enum Command {
 
         /// -f to stay compatible with GNU rm
         #[structopt(long = "force", short = "f")]
-        force: bool,
+        _force: bool,
     },
 
     #[structopt(name = "restore")]
     Restore,
 }
 
-fn main() {
+fn main() -> Result<(), Error> {
     env_logger::init();
 
     let cmd = Command::from_args();
@@ -120,10 +121,12 @@ fn main() {
                 Ok(i) if i < files.len() => {
                     let info = files.get(i).unwrap();
                     println!("moving {:?} to {:?}", &info.deleted_path, &info.path);
-                    fs::rename(&info.deleted_path, &info.path);
+                    fs::rename(&info.deleted_path, &info.path)?;
                 }
                 _ => println!("Invalid number."),
             }
         }
     }
+
+    Ok(())
 }

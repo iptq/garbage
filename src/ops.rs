@@ -9,9 +9,6 @@ use crate::trashinfo::TrashInfo;
 
 pub fn empty(dry: bool, days: Option<u32>) -> Result<(), Error> {
     let home_trash = TrashDir::get_home_trash();
-    let files_dir = home_trash.files_dir()?;
-    let info_dir = home_trash.info_dir()?;
-
     let cutoff = if let Some(days) = days {
         Local::now() - Duration::days(days.into())
     } else {
@@ -20,11 +17,8 @@ pub fn empty(dry: bool, days: Option<u32>) -> Result<(), Error> {
     for file in home_trash.iter()? {
         let file = file?;
 
-        let mut ignore = false;
         // ignore files that were deleted after the cutoff (younger)
-        if file.deletion_date > cutoff {
-            ignore = true;
-        }
+        let ignore = file.deletion_date > cutoff;
 
         if !ignore {
             if dry {
@@ -70,7 +64,10 @@ pub fn put(path: impl AsRef<Path>, recursive: bool) -> Result<(), Error> {
         trash_info.write(&trash_info_file)?;
     }
 
-    fs::rename(path, trash_file_path)?;
+    let result = fs::rename(&path, &trash_file_path);
+    if result.is_err() {
+        fs::copy(&path, &trash_file_path)?;
+    }
 
     Ok(())
 }

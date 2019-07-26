@@ -89,11 +89,11 @@ impl TrashInfo {
     }
 
     pub fn write(&self, mut out: impl Write) -> Result<(), io::Error> {
-        out.write(b"[Trash Info]\n")?;
-        write!(out, "Path={}\n", self.path.to_str().unwrap())?;
-        write!(
+        writeln!(out, "[Trash Info]")?;
+        writeln!(out, "Path={}", self.path.to_str().unwrap())?;
+        writeln!(
             out,
-            "DeletionDate={}\n",
+            "DeletionDate={}",
             self.deletion_date.format(DATE_FORMAT)
         )?;
         Ok(())
