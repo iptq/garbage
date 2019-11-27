@@ -1,15 +1,19 @@
 [package]
-name = "trash"
+name = "trash-cli"
 version = "0.1.1"
 authors = ["Michael Zhang <iptq@protonmail.com>"]
 edition = "2018"
 
+[[bin]]
+name = "trash"
+path = "src/main.rs"
+
 [dependencies]
 chrono = "0.4"
-env_logger = "0.6"
+env_logger = "0.7"
 lazy_static = "1.0"
 log = "0.4"
 regex = "1.1"
-structopt = "0.2"
+structopt = "0.3"
 walkdir = "2.2"
 xdg = "2.2"

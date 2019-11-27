@@ -43,7 +43,7 @@ impl TrashDir {
     }
 }
 
-pub struct TrashDirIter(PathBuf, Box<Iterator<Item = walkdir::Result<DirEntry>>>);
+pub struct TrashDirIter(PathBuf, Box<dyn Iterator<Item = walkdir::Result<DirEntry>>>);
 
 impl Iterator for TrashDirIter {
     type Item = Result<TrashInfo, Error>;
