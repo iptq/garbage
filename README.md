@@ -1,5 +1,5 @@
-trash-cli
-=========
+garbage
+=======
 
 rust ver of trash-cli, basic functionality is in, code is probably shit
 
@@ -9,14 +9,14 @@ Usage
 -----
 
 ```
-$ trash put [-r] file1 file2 ...
+$ garbage put [-r] file1 file2 ...
 
-$ trash restore
+$ garbage restore
 [..interactive]
 
-$ trash list
+$ garbage list
 
-$ trash empty [days]
+$ garbage empty [days]
 ```
 
 About

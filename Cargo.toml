@@ -1,11 +1,11 @@
 [package]
-name = "trash-cli"
+name = "garbage"
 version = "0.1.1"
 authors = ["Michael Zhang <iptq@protonmail.com>"]
 edition = "2018"
 
 [[bin]]
-name = "trash"
+name = "garbage"
 path = "src/main.rs"
 
 [dependencies]

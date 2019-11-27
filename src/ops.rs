@@ -4,8 +4,8 @@ use std::path::Path;
 use chrono::{Duration, Local};
 
 use crate::errors::Error;
-use crate::trashdir::TrashDir;
-use crate::trashinfo::TrashInfo;
+use crate::dir::TrashDir;
+use crate::info::TrashInfo;
 
 pub fn empty(dry: bool, days: Option<u32>) -> Result<(), Error> {
     let home_trash = TrashDir::get_home_trash();

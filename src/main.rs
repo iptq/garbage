@@ -5,8 +5,8 @@ extern crate log;
 
 mod errors;
 mod ops;
-mod trashdir;
-mod trashinfo;
+mod dir;
+mod info;
 
 use std::fs;
 use std::io;
@@ -16,7 +16,7 @@ use structopt::StructOpt;
 use xdg::BaseDirectories;
 
 use crate::errors::Error;
-use crate::trashdir::TrashDir;
+use crate::dir::TrashDir;
 
 lazy_static! {
     static ref XDG: BaseDirectories = BaseDirectories::new().unwrap();

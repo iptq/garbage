@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use walkdir::{DirEntry, WalkDir};
 
 use crate::errors::Error;
-use crate::trashinfo::TrashInfo;
+use crate::info::TrashInfo;
 use crate::XDG;
 
 #[derive(Debug)]
