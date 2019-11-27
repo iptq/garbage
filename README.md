@@ -5,6 +5,13 @@ rust ver of trash-cli, basic functionality is in, code is probably shit
 
 full free-desktop compliance when
 
+Installation
+------------
+
+```
+cargo install garbage
+```
+
 Usage
 -----
 
