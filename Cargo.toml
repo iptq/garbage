@@ -11,11 +11,13 @@ name = "garbage"
 path = "src/main.rs"
 
 [dependencies]
+anyhow = "1.0"
 chrono = "0.4"
 env_logger = "0.7"
 lazy_static = "1.0"
 log = "0.4"
 regex = "1.1"
 structopt = "0.3"
+thiserror = "1.0"
 walkdir = "2.2"
 xdg = "2.2"

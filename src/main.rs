@@ -2,6 +2,8 @@
 extern crate lazy_static;
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate thiserror;
 
 mod errors;
 mod ops;

@@ -1,32 +1,21 @@
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum Error {
-    Io(std::io::Error),
-    WalkDir(walkdir::Error),
-    BadTrashInfo(TrashInfoError),
-    ParseDate(chrono::format::ParseError),
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
+    #[error("Walkdir error: {0}")]
+    WalkDir(#[from] walkdir::Error),
+    #[error("Bad .trashinfo file: {0}")]
+    BadTrashInfo(#[from] TrashInfoError),
+    #[error("Date parsing error: {0}")]
+    ParseDate(#[from] chrono::format::ParseError),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum TrashInfoError {
+    #[error("Missing [TrashInfo] header")]
     MissingHeader,
+    #[error("Missing path attribute")]
     MissingPath,
+    #[error("Missing date attribute")]
     MissingDate,
-}
-
-impl From<std::io::Error> for Error {
-    fn from(err: std::io::Error) -> Self {
-        Error::Io(err)
-    }
-}
-
-impl From<walkdir::Error> for Error {
-    fn from(err: walkdir::Error) -> Self {
-        Error::WalkDir(err)
-    }
-}
-
-impl From<chrono::format::ParseError> for Error {
-    fn from(err: chrono::format::ParseError) -> Self {
-        Error::ParseDate(err)
-    }
 }
