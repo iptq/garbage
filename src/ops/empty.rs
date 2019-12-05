@@ -13,6 +13,7 @@ pub fn empty(dry: bool, days: Option<u32>) -> Result<(), Error> {
     } else {
         Local::now()
     };
+
     for file in home_trash.iter()? {
         let file = file?;
 
