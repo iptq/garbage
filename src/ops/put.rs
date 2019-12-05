@@ -18,14 +18,8 @@ pub enum Error {
 }
 
 pub fn put(paths: Vec<PathBuf>, recursive: bool) -> Result<()> {
-    // println!("HOME MOUNT: {:?}", *HOME_MOUNT);
     let strategy = DeletionStrategy::Copy;
     for path in paths {
-        println!(
-            "PATH: {:?}, MOUNTPOINT: {:?}",
-            &path,
-            MOUNTS.get_mount_point(&path)
-        );
         if let Err(err) = strategy.delete(path) {
             eprintln!("{:?}", err);
         }
@@ -168,9 +162,6 @@ impl DeletionStrategy {
 
         // don't allow deleting '.' or '..'
         let current_dir = env::current_dir()?;
-        println!("target: {:?}", target);
-        println!("current_dir: {:?}", current_dir);
-        println!("current_dir parent: {:?}", current_dir.parent());
         ensure!(
             !(target == current_dir
                 || (current_dir.parent().is_some() && target == current_dir.parent().unwrap())),
@@ -185,9 +176,6 @@ impl DeletionStrategy {
             None => bail!("no trash dir could be selected, u suck"),
         };
 
-        println!("Trash dir: {:?}", trash_dir);
-        println!("Copying?: {:?}", copy);
-
         // preparing metadata
         let now = Local::now();
         let elapsed = now.timestamp_millis();
@@ -201,7 +189,7 @@ impl DeletionStrategy {
         let trash_info_path = trash_dir.info_dir()?.join(file_name + ".trashinfo");
 
         let trash_info = TrashInfo {
-            path: target.to_path_buf(),
+            path: utils::into_absolute(target)?,
             deletion_date: now,
             deleted_path: trash_file_path.clone(),
             info_path: trash_info_path.clone(),

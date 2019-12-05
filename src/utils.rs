@@ -40,8 +40,6 @@ pub fn recursive_copy(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> Result<()
         } else {
             fs::copy(path, &target_name);
         }
-        println!("entry path: {:?}", relative_path);
-        println!("> copied to: {:?}", target_name);
     }
 
     Ok(())
