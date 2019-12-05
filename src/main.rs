@@ -1,28 +1,14 @@
 #[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate thiserror;
-
-mod errors;
-mod ops;
-mod dir;
-mod info;
+extern crate anyhow;
 
 use std::fs;
 use std::io;
 use std::path::PathBuf;
 
+use anyhow::Error;
 use structopt::StructOpt;
-use xdg::BaseDirectories;
 
-use crate::errors::Error;
-use crate::dir::TrashDir;
-
-lazy_static! {
-    static ref XDG: BaseDirectories = BaseDirectories::new().unwrap();
-}
+use garbage::*;
 
 #[derive(StructOpt)]
 enum Command {
@@ -63,11 +49,13 @@ enum Command {
 fn main() -> Result<(), Error> {
     env_logger::init();
 
+    // println!("{:?}", *garbage::MOUNTS);
+
     let cmd = Command::from_args();
     match cmd {
-        Command::Empty { dry, days } => match crate::ops::empty(dry, days) {
+        Command::Empty { dry, days } => match ops::empty(dry, days) {
             Ok(_) => (),
-            Err(err) => error!("error: {:?}", err),
+            Err(err) => eprintln!("error: {:?}", err),
         },
         Command::List => {
             let home_trash = TrashDir::get_home_trash();
@@ -75,7 +63,7 @@ fn main() -> Result<(), Error> {
                 let info = match info {
                     Ok(info) => info,
                     Err(err) => {
-                        warn!("failed to get file info: {:?}", err);
+                        eprintln!("failed to get file info: {:?}", err);
                         continue;
                     }
                 };
@@ -85,26 +73,22 @@ fn main() -> Result<(), Error> {
         Command::Put {
             paths, recursive, ..
         } => {
-            for path in paths {
-                match crate::ops::put(path, recursive) {
-                    Ok(_) => (),
-                    Err(err) => error!("error: {:?}", err),
-                }
-            }
+            ops::put(paths, recursive);
         }
         Command::Restore => {
             let home_trash = TrashDir::get_home_trash();
-            let files = home_trash
+            let mut files = home_trash
                 .iter()
                 .unwrap()
                 .filter_map(|entry| match entry {
                     Ok(info) => Some(info),
                     Err(err) => {
-                        warn!("failed to get file info: {:?}", err);
+                        eprintln!("failed to get file info: {:?}", err);
                         None
                     }
                 })
                 .collect::<Vec<_>>();
+            files.sort_unstable_by_key(|info| info.deletion_date);
             for (i, info) in files.iter().enumerate() {
                 println!(
                     "[{}]\t{}\t{}",

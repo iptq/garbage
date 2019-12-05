@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use walkdir::{DirEntry, WalkDir};
 
@@ -7,12 +7,16 @@ use crate::errors::Error;
 use crate::info::TrashInfo;
 use crate::XDG;
 
-#[derive(Debug)]
-pub struct TrashDir(PathBuf);
+#[derive(Clone, Debug)]
+pub struct TrashDir(pub PathBuf);
 
 impl TrashDir {
     pub fn get_home_trash() -> Self {
         TrashDir(XDG.get_data_home().join("Trash"))
+    }
+
+    pub fn path(&self) -> &Path {
+        self.0.as_ref()
     }
 
     pub fn files_dir(&self) -> Result<PathBuf, Error> {
