@@ -25,7 +25,11 @@ pub fn empty(dry: bool, days: Option<u32>) -> Result<(), Error> {
                 println!("{:?}", file.path);
             } else {
                 fs::remove_file(file.info_path)?;
-                fs::remove_file(file.deleted_path)?;
+                if file.deleted_path.is_dir() {
+                    fs::remove_dir_all(file.deleted_path)?;
+                } else {
+                    fs::remove_file(file.deleted_path)?;
+                }
             }
         }
     }

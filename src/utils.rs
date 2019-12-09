@@ -2,8 +2,8 @@ use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use walkdir::WalkDir;
 use anyhow::Error;
+use walkdir::WalkDir;
 
 pub fn into_absolute(path: impl AsRef<Path>) -> Result<PathBuf, Error> {
     let path = path.as_ref();
@@ -23,7 +23,11 @@ pub fn recursive_copy(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> Result<()
     let src = src.as_ref();
     let dst = dst.as_ref();
 
-    for entry in WalkDir::new(src).contents_first(false).follow_links(false).same_file_system(true) {
+    for entry in WalkDir::new(src)
+        .contents_first(false)
+        .follow_links(false)
+        .same_file_system(true)
+    {
         let entry = entry?;
         let path = entry.path();
         let relative_path = path.strip_prefix(src)?;
