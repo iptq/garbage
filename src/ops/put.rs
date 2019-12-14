@@ -28,53 +28,6 @@ pub fn put(paths: Vec<PathBuf>, recursive: bool) -> Result<()> {
     Ok(())
 }
 
-// fn put_single(path: impl AsRef<Path>, recursive: bool) -> Result<()> {
-//     let current_dir = env::current_dir()?;
-//     let path = path.as_ref().canonicalize()?;
-
-//     ensure!(
-//         path == current_dir
-//             || (current_dir.parent().is_some() && path == current_dir.parent().unwrap()),
-//         Error::CannotTrashDotDirs
-//     );
-
-//     // if path.is_dir() && !recursive {
-//     //     error!("cannot trash directories without --recursive");
-//     //     return Ok(());
-//     // }
-
-//     let now = Local::now();
-//     let elapsed = now.timestamp_millis();
-
-//     let home_trash = TrashDir::get_home_trash();
-//     let file_name = format!(
-//         "{}.{}",
-//         elapsed,
-//         path.file_name().unwrap().to_str().unwrap()
-//     );
-
-//     let trash_file_path = home_trash.files_dir()?.join(&file_name);
-//     let trash_info_path = home_trash.info_dir()?.join(file_name + ".trashinfo");
-
-//     let trash_info = TrashInfo {
-//         path: path.clone(),
-//         deletion_date: now,
-//         deleted_path: trash_file_path.clone(),
-//         info_path: trash_info_path.clone(),
-//     };
-//     {
-//         let trash_info_file = File::create(trash_info_path)?;
-//         trash_info.write(&trash_info_file)?;
-//     }
-
-//     let result = fs::rename(&path, &trash_file_path);
-//     if result.is_err() {
-//         fs::copy(&path, &trash_file_path)?;
-//     }
-
-//     Ok(())
-// }
-
 pub enum DeletionStrategy {
     Copy,
     Topdir,
