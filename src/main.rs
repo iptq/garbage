@@ -5,7 +5,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-use anyhow::Error;
+use anyhow::Result;
 use structopt::StructOpt;
 
 use garbage::*;
@@ -46,15 +46,12 @@ enum Command {
     Restore,
 }
 
-fn main() -> Result<(), Error> {
+fn run() -> Result<()> {
     env_logger::init();
 
     let cmd = Command::from_args();
     match cmd {
-        Command::Empty { dry, days } => match ops::empty(dry, days) {
-            Ok(_) => (),
-            Err(err) => eprintln!("error: {:?}", err),
-        },
+        Command::Empty { dry, days } => ops::empty(dry, days),
         Command::List => {
             let home_trash = TrashDir::get_home_trash();
             let mut files = home_trash
@@ -72,12 +69,13 @@ fn main() -> Result<(), Error> {
             for info in files {
                 println!("{}\t{}", info.deletion_date, info.path.to_str().unwrap());
             }
+            Ok(())
         }
         Command::Put {
-            paths, recursive, force
-        } => {
-            ops::put(paths, recursive);
-        }
+            paths,
+            recursive,
+            force,
+        } => ops::put(paths, recursive),
         Command::Restore => {
             let home_trash = TrashDir::get_home_trash();
             let mut files = home_trash
@@ -114,8 +112,19 @@ fn main() -> Result<(), Error> {
                 }
                 _ => println!("Invalid number."),
             }
+            Ok(())
         }
     }
+}
 
-    Ok(())
+fn main() {
+    match run() {
+        Ok(_) => (),
+        Err(err) => {
+            eprintln!("Error: {:?}", err);
+            for cause in err.chain() {
+                eprintln!("- {:?}", cause);
+            }
+        }
+    }
 }

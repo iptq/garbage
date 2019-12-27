@@ -1,12 +1,12 @@
 use std::fs;
 
-use anyhow::Error;
+use anyhow::Result;
 use chrono::{Duration, Local};
 
 use crate::TrashDir;
 use crate::TrashInfo;
 
-pub fn empty(dry: bool, days: Option<u32>) -> Result<(), Error> {
+pub fn empty(dry: bool, days: Option<u32>) -> Result<()> {
     let home_trash = TrashDir::get_home_trash();
     let cutoff = if let Some(days) = days {
         Local::now() - Duration::days(days.into())
