@@ -3,8 +3,8 @@ use std::path::{Path, PathBuf};
 
 use walkdir::{DirEntry, WalkDir};
 
-use crate::errors::Error;
-use crate::info::TrashInfo;
+use crate::Error;
+use crate::TrashInfo;
 use crate::XDG;
 
 #[derive(Clone, Debug)]

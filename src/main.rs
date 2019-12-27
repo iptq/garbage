@@ -37,9 +37,9 @@ enum Command {
         #[structopt(long = "recursive", short = "r")]
         recursive: bool,
 
-        /// -f to stay compatible with GNU rm
+        /// Suppress prompts/messages
         #[structopt(long = "force", short = "f")]
-        _force: bool,
+        force: bool,
     },
 
     #[structopt(name = "restore")]
@@ -74,7 +74,7 @@ fn main() -> Result<(), Error> {
             }
         }
         Command::Put {
-            paths, recursive, ..
+            paths, recursive, force
         } => {
             ops::put(paths, recursive);
         }
