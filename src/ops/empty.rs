@@ -4,7 +4,6 @@ use anyhow::Result;
 use chrono::{Duration, Local};
 
 use crate::TrashDir;
-use crate::TrashInfo;
 
 pub fn empty(dry: bool, days: Option<u32>) -> Result<()> {
     let home_trash = TrashDir::get_home_trash();

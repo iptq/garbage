@@ -1,4 +1,5 @@
-#[macro_use]
+#![deny(warnings)]
+
 extern crate anyhow;
 
 use std::fs;
@@ -75,7 +76,7 @@ fn run() -> Result<()> {
             paths,
             recursive,
             force,
-        } => ops::put(paths, recursive),
+        } => ops::put(paths, recursive, force),
         Command::Restore => {
             let home_trash = TrashDir::get_home_trash();
             let mut files = home_trash

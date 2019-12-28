@@ -1,6 +1,7 @@
+#![deny(warnings)]
+
 #[macro_use]
 extern crate lazy_static;
-#[macro_use]
 extern crate log;
 #[macro_use]
 extern crate anyhow;
@@ -14,7 +15,6 @@ mod mounts;
 pub mod ops;
 mod utils;
 
-use std::io;
 use std::path::PathBuf;
 
 use xdg::BaseDirectories;

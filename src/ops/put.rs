@@ -4,7 +4,7 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
-use chrono::{Duration, Local};
+use chrono::{Local};
 
 use crate::utils;
 use crate::TrashDir;
@@ -17,7 +17,7 @@ pub enum Error {
     CannotTrashDotDirs,
 }
 
-pub fn put(paths: Vec<PathBuf>, recursive: bool) -> Result<()> {
+pub fn put(paths: Vec<PathBuf>, _recursive: bool, _force: bool) -> Result<()> {
     let strategy = DeletionStrategy::Copy;
     for path in paths {
         if let Err(err) = strategy.delete(path) {
@@ -28,6 +28,8 @@ pub fn put(paths: Vec<PathBuf>, recursive: bool) -> Result<()> {
     Ok(())
 }
 
+// TODO: implement the other ones
+#[allow(dead_code)]
 pub enum DeletionStrategy {
     Copy,
     Topdir,
@@ -41,7 +43,7 @@ impl DeletionStrategy {
         path: impl AsRef<Path>,
     ) -> Option<(TrashDir, bool)> {
         let mount = mount.as_ref();
-        let path = path.as_ref();
+        let _path = path.as_ref();
 
         // first, are we on the home mount?
         if mount == *HOME_MOUNT {
@@ -155,7 +157,7 @@ impl DeletionStrategy {
         // copy the file over
         if copy {
             utils::recursive_copy(&target, &trash_file_path)?;
-            fs::remove_dir_all(&target);
+            fs::remove_dir_all(&target)?;
         } else {
             fs::rename(&target, &trash_file_path)?;
         }
