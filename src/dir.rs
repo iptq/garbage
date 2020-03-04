@@ -7,14 +7,23 @@ use crate::Error;
 use crate::TrashInfo;
 use crate::XDG;
 
+/// A trash directory represented by a path.
 #[derive(Clone, Debug)]
 pub struct TrashDir(pub PathBuf);
 
 impl TrashDir {
+    /// Gets your user's "home" trash directory.
+    ///
+    /// According to Trash spec v1.0:
+    ///
+    /// > For every user2 a “home trash” directory MUST be available.
+    /// > Its name and location are $XDG_DATA_HOME/Trash;
+    /// > $XDG_DATA_HOME is the base directory for user-specific data, as defined in the Desktop Base Directory Specification.
     pub fn get_home_trash() -> Self {
         TrashDir(XDG.get_data_home().join("Trash"))
     }
 
+    /// Returns the path to this trash directory.
     pub fn path(&self) -> &Path {
         self.0.as_ref()
     }

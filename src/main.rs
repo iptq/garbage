@@ -7,23 +7,16 @@ use std::io;
 use std::path::PathBuf;
 
 use anyhow::Result;
+use garbage::{
+    ops::{self, EmptyOptions},
+    TrashDir,
+};
 use structopt::StructOpt;
-
-use garbage::*;
 
 #[derive(StructOpt)]
 enum Command {
     #[structopt(name = "empty")]
-    Empty {
-        /// Only list the files that are to be deleted, without
-        /// actually deleting anything.
-        #[structopt(long = "dry")]
-        dry: bool,
-
-        /// Delete all files older than (this number) of days.
-        /// Removes everything if this option is not specified
-        days: Option<u32>,
-    },
+    Empty(EmptyOptions),
 
     #[structopt(name = "list")]
     List,
@@ -52,24 +45,9 @@ fn run() -> Result<()> {
 
     let cmd = Command::from_args();
     match cmd {
-        Command::Empty { dry, days } => ops::empty(dry, days),
+        Command::Empty(options) => ops::empty(options),
         Command::List => {
-            let home_trash = TrashDir::get_home_trash();
-            let mut files = home_trash
-                .iter()
-                .unwrap()
-                .filter_map(|entry| match entry {
-                    Ok(info) => Some(info),
-                    Err(err) => {
-                        eprintln!("failed to get file info: {:?}", err);
-                        None
-                    }
-                })
-                .collect::<Vec<_>>();
-            files.sort_unstable_by_key(|info| info.deletion_date);
-            for info in files {
-                println!("{}\t{}", info.deletion_date, info.path.to_str().unwrap());
-            }
+            ops::list();
             Ok(())
         }
         Command::Put {

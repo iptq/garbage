@@ -13,27 +13,33 @@ lazy_static! {
 
 const DATE_FORMAT: &str = "%Y-%m-%dT%H:%M:%S";
 
+/// .trashinfo Data
 #[derive(Debug)]
 pub struct TrashInfo {
     /// The original path where this file was located before it was deleted.
     pub path: PathBuf,
+
+    /// The date the file was deleted.
     pub deletion_date: DateTime<Local>,
 
     /// The location of the deleted file after deletion.
     pub deleted_path: PathBuf,
+
     /// The location of the `info` description file.
     pub info_path: PathBuf,
 }
 
 impl TrashInfo {
+    /// Create a new TrashInfo based on the .trashinfo path and the deleted file path
+    ///
+    /// This is useful for reading files from the Trash.
     pub fn from_files(
         info_path: impl AsRef<Path>,
         deleted_path: impl AsRef<Path>,
     ) -> Result<Self, Error> {
-        let path = info_path.as_ref();
-        let info_path = path.to_path_buf();
+        let info_path = info_path.as_ref().to_path_buf();
         let deleted_path = deleted_path.as_ref().to_path_buf();
-        let file = File::open(path)?;
+        let file = File::open(&info_path)?;
         let reader = BufReader::new(file);
 
         let mut path = None;
@@ -88,6 +94,7 @@ impl TrashInfo {
         })
     }
 
+    /// Write the current TrashInfo into a .trashinfo file.
     pub fn write(&self, mut out: impl Write) -> Result<(), io::Error> {
         writeln!(out, "[Trash Info]")?;
         writeln!(out, "Path={}", self.path.to_str().unwrap())?;

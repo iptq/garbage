@@ -19,6 +19,7 @@ pub fn get_uid() -> u64 {
     unsafe { libc::getuid().into() }
 }
 
+/// This function recursively copies all the contents of src into dst.
 pub fn recursive_copy(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> Result<()> {
     let src = src.as_ref();
     let dst = dst.as_ref();

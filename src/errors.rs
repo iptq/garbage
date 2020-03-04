@@ -1,4 +1,6 @@
+/// All errors that could happen
 #[derive(Debug, Error)]
+#[allow(missing_docs)]
 pub enum Error {
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
@@ -10,7 +12,9 @@ pub enum Error {
     ParseDate(#[from] chrono::format::ParseError),
 }
 
+/// Errors related to .trashinfo files
 #[derive(Debug, Error)]
+#[allow(missing_docs)]
 pub enum TrashInfoError {
     #[error("Missing [TrashInfo] header")]
     MissingHeader,
