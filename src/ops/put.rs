@@ -16,6 +16,9 @@ pub enum Error {
     #[error("File {0} doesn't exist.")]
     FileDoesntExist(PathBuf),
 
+    #[error("Refusing to remove directory {0} without '-r' option")]
+    MissingRecursiveOption(PathBuf),
+
     #[error("Refusing to remove '.' or '..', skipping...")]
     CannotTrashDotDirs,
 
@@ -28,6 +31,14 @@ pub struct PutOptions {
     /// The target path to be trashed
     #[structopt(parse(from_os_str))]
     paths: Vec<PathBuf>,
+
+    /// Don't actually move anything, just print the files to be removed
+    #[structopt(long = "dry")]
+    dry: bool,
+
+    /// Prompt before every removal
+    #[structopt(long = "prompt", short = "i")]
+    prompt: bool,
 
     /// Trashes directories recursively
     #[structopt(long = "recursive", short = "r")]
@@ -66,9 +77,11 @@ pub fn put(options: PutOptions) -> Result<()> {
         } else {
             DeletionStrategy::pick_strategy(path)?
         };
-        println!("Strategy: {:?}", strategy);
+        // println!("Strategy: {:?}", strategy);
 
-        if let Err(err) = strategy.delete(path, options.force) {
+        if options.dry {
+            eprintln!("Dry-deleting: {}", path.to_str().unwrap());
+        } else if let Err(err) = strategy.delete(path, &options) {
             eprintln!("{}", err);
         }
     }
@@ -136,63 +149,36 @@ impl DeletionStrategy {
         }
     }
 
-    // fn get_target_trash(
-    //     &self,
-    //     mount: impl AsRef<Path>,
-    //     path: impl AsRef<Path>,
-    // ) -> Option<(TrashDir, bool)> {
-    //     let mount = mount.as_ref();
-    //     let _path = path.as_ref();
-
-    //     // first, are we on the home mount?
-    //     if mount == *HOME_MOUNT {
-    //         return Some((HOME_TRASH.clone(), false));
-    //     }
-
-    //     // are we just copying?
-    //     if let DeletionStrategy::Copy = self {
-    //         return Some((HOME_TRASH.clone(), true));
-    //     }
-
-    //     // try to use the $topdir/.Trash directory
-    //     let topdir_trash = mount.join(".Trash");
-    //     if self.should_use_topdir_trash(&topdir_trash) {
-    //         return Some((
-    //             TrashDir(topdir_trash.join(utils::get_uid().to_string())),
-    //             false,
-    //         ));
-    //     }
-
-    //     // try to use the $topdir/.Trash-$uid directory
-    //     let topdir_trash_uid = mount.join(format!(".Trash-{}", utils::get_uid()));
-    //     if self.should_use_topdir_trash_uid(&topdir_trash_uid) {
-    //         return Some((TrashDir(topdir_trash_uid), false));
-    //     }
-
-    //     // do we have the copy option
-    //     if let DeletionStrategy::TopdirOrCopy = self {
-    //         return Some((HOME_TRASH.clone(), true));
-    //     }
-
-    //     None
-    // }
-
     /// The actual deletion happens here
-    pub fn delete(&self, target: impl AsRef<Path>, force: bool) -> Result<()> {
+    pub fn delete(&self, target: impl AsRef<Path>, options: &PutOptions) -> Result<()> {
         let target = target.as_ref();
+
+        // this will be None if target isn't a symlink
+        let link_info = target.read_link().ok();
+
+        // file doesn't exist
         if !target.exists() {
             bail!(Error::FileDoesntExist(target.to_path_buf()));
+        }
+
+        // file is a directory
+        if !link_info.is_some() && target.is_dir() && !options.recursive {
+            bail!(Error::MissingRecursiveOption(target.to_path_buf()));
         }
 
         let (trash_dir, requires_copy) = self.get_target_trash();
 
         // prompt if not suppressed
-        if !force {
-            eprint!(
-                "Copy file '{}' to the trash? [Y/n] ",
-                target.to_str().unwrap()
-            );
-            let should_copy = loop {
+        if !options.force {
+            if requires_copy {
+                eprint!(
+                    "Removing file '{}' requires potentially expensive copying. Continue? [Y/n] ",
+                    target.to_str().unwrap()
+                );
+            } else if options.prompt {
+                eprint!("Remove file '{}'? [Y/n] ", target.to_str().unwrap());
+            }
+            let should_continue = loop {
                 let stdin = io::stdin();
                 let mut s = String::new();
                 stdin.read_line(&mut s).unwrap();
@@ -204,7 +190,7 @@ impl DeletionStrategy {
                     }
                 }
             };
-            if !should_copy {
+            if !should_continue {
                 bail!(Error::CancelledByUser);
             }
         }

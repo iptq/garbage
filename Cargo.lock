@@ -88,7 +88,7 @@ dependencies = [
 
 [[package]]
 name = "garbage"
-version = "0.2.0"
+version = "0.2.0-rc1"
 dependencies = [
  "anyhow 1.0.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
