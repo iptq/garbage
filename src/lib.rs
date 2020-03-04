@@ -17,7 +17,6 @@ mod errors;
 mod info;
 mod mounts;
 pub mod ops;
-mod strategy;
 mod utils;
 
 use std::path::PathBuf;

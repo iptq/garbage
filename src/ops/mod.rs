@@ -6,6 +6,6 @@ mod put;
 mod restore;
 
 pub use self::empty::{empty, EmptyOptions};
-pub use self::list::list;
-pub use self::put::put;
-pub use self::restore::restore;
+pub use self::list::{list, ListOptions};
+pub use self::put::{put, PutOptions};
+pub use self::restore::{restore, RestoreOptions};

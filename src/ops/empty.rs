@@ -11,22 +11,23 @@ use crate::TrashDir;
 pub struct EmptyOptions {
     /// Only list the files that are to be deleted, without
     /// actually deleting anything.
+    #[structopt(long = "dry")]
     pub dry: bool,
 
-    /// Delete all files older than (this number) of days.
+    /// Delete all files older than (this number) of integer days.
     /// Removes everything if this option is not specified
+    #[structopt(long = "days")]
     days: Option<u32>,
 
     /// The path to the trash directory to empty.
+    /// By default, this is your home directory's trash ($XDG_DATA_HOME/Trash)
+    #[structopt(long = "trash-dir", parse(from_os_str))]
     trash_dir: Option<PathBuf>,
 }
 
 /// Actually delete files in the trash.
 pub fn empty(options: EmptyOptions) -> Result<()> {
-    let trash_dir = options
-        .trash_dir
-        .map(TrashDir)
-        .unwrap_or_else(|| TrashDir::get_home_trash());
+    let trash_dir = TrashDir::from_opt(options.trash_dir);
 
     // cutoff date
     let cutoff = if let Some(days) = options.days {
