@@ -6,6 +6,7 @@ use anyhow::Result;
 
 use crate::TrashDir;
 
+/// Options to pass to restore
 #[derive(StructOpt)]
 pub struct RestoreOptions {
     /// The path to the trash directory to restore from.
@@ -14,6 +15,7 @@ pub struct RestoreOptions {
     trash_dir: Option<PathBuf>,
 }
 
+/// Restore files from a trash directory
 pub fn restore(options: RestoreOptions) -> Result<()> {
     let trash_dir = TrashDir::from_opt(options.trash_dir);
 

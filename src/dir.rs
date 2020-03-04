@@ -12,6 +12,7 @@ use crate::XDG;
 pub struct TrashDir(pub PathBuf);
 
 impl TrashDir {
+    /// Constructor for a new trash directory.
     pub fn from(path: impl AsRef<Path>) -> Self {
         TrashDir(path.as_ref().to_path_buf())
     }
@@ -27,11 +28,15 @@ impl TrashDir {
         TrashDir::from(XDG.get_data_home().join("Trash"))
     }
 
+    /// Create a trash directory from an optional path
+    ///
+    /// If the option is None, then the home trash will be selected instead.
     pub fn from_opt(opt: Option<impl AsRef<Path>>) -> Self {
         opt.map(|path| TrashDir::from(path.as_ref().to_path_buf()))
             .unwrap_or_else(|| TrashDir::get_home_trash())
     }
 
+    /// Actually create the directory on disk corresponding to this trash directory
     pub fn create(&self) -> Result<(), Error> {
         let path = &self.0;
         if !path.exists() {
@@ -45,6 +50,7 @@ impl TrashDir {
         self.0.as_ref()
     }
 
+    /// Get the `files` directory
     pub fn files_dir(&self) -> Result<PathBuf, Error> {
         let target = self.0.join("files");
         if !target.exists() {
@@ -53,6 +59,7 @@ impl TrashDir {
         Ok(target)
     }
 
+    /// Get the `info` directory
     pub fn info_dir(&self) -> Result<PathBuf, Error> {
         let target = self.0.join("info");
         if !target.exists() {
@@ -61,6 +68,7 @@ impl TrashDir {
         Ok(target)
     }
 
+    /// Iterate over trash infos within this trash directory
     pub fn iter(&self) -> Result<TrashDirIter, Error> {
         let iter = WalkDir::new(&self.info_dir()?)
             .contents_first(true)

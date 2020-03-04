@@ -9,7 +9,7 @@ use chrono::Local;
 
 use crate::utils;
 use crate::{TrashDir, TrashInfo};
-use crate::{HOME_MOUNT, HOME_TRASH, MOUNTS};
+use crate::{HOME_MOUNT, MOUNTS};
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -275,7 +275,6 @@ fn should_use_topdir_trash(mount: impl AsRef<Path>) -> bool {
 }
 
 /// Can we use $topdir/.Trash-uid?
-
 fn should_use_topdir_trash_uid(path: impl AsRef<Path>) -> bool {
     let path = path.as_ref();
     if !path.exists() {
@@ -284,6 +283,5 @@ fn should_use_topdir_trash_uid(path: impl AsRef<Path>) -> bool {
             Err(_) => return false,
         };
     }
-
     return true;
 }

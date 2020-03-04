@@ -4,6 +4,7 @@ use anyhow::Result;
 
 use crate::TrashDir;
 
+/// Options to pass to list
 #[derive(StructOpt)]
 pub struct ListOptions {
     /// The path to the trash directory to list.
@@ -12,6 +13,7 @@ pub struct ListOptions {
     trash_dir: Option<PathBuf>,
 }
 
+/// List the contents of a trash directory
 pub fn list(options: ListOptions) -> Result<()> {
     let trash_dir = TrashDir::from_opt(options.trash_dir);
 
