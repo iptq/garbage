@@ -52,7 +52,7 @@ pub fn restore(options: RestoreOptions) -> Result<()> {
 
     match s.trim_end().parse::<usize>() {
         Ok(i) if i < files.len() => {
-            let info = files.get(i).unwrap();
+            let info = &files[i]; // should never fail since we just checked
             eprintln!("moving {:?} to {:?}", &info.deleted_path, &info.path);
             fs::remove_file(&info.info_path)?;
             fs::rename(&info.deleted_path, &info.path)?;

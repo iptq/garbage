@@ -1,6 +1,6 @@
 use std::env;
 use std::fs::{self, File};
-use std::io;
+use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 
@@ -170,6 +170,7 @@ impl DeletionStrategy {
 
         // prompt if not suppressed
         if !options.force {
+            // TODO: actually handle prompting instead of manually flushing
             if requires_copy {
                 eprint!(
                     "Removing file '{}' requires potentially expensive copying. Continue? [Y/n] ",
@@ -178,6 +179,8 @@ impl DeletionStrategy {
             } else if options.prompt {
                 eprint!("Remove file '{}'? [Y/n] ", target.to_str().unwrap());
             }
+            io::stderr().flush()?;
+
             let should_continue = loop {
                 let stdin = io::stdin();
                 let mut s = String::new();
