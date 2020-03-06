@@ -19,7 +19,12 @@ pub struct RestoreOptions {
 pub fn restore(options: RestoreOptions) -> Result<()> {
     let trash_dir = TrashDir::from_opt(options.trash_dir);
 
+    if trash_dir.check_info_dir()?.is_none() {
+        bail!("There's no trash directory here.");
+    }
+
     // get list of files sorted by deletion date
+    // TODO: possible to get this to be streaming?
     let files = {
         let mut files = trash_dir
             .iter()
@@ -35,6 +40,10 @@ pub fn restore(options: RestoreOptions) -> Result<()> {
         files.sort_unstable_by_key(|info| info.deletion_date);
         files
     };
+
+    if files.len() == 0 {
+        bail!("No files in this trash directory.");
+    }
 
     for (i, info) in files.iter().enumerate() {
         println!(

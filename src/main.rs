@@ -46,9 +46,9 @@ fn main() {
         Ok(_) => (),
         Err(err) => {
             eprintln!("Error: {:?}", err);
-            for cause in err.chain() {
-                eprintln!("- {:?}", cause);
-            }
+            // for cause in err.chain() {
+            //     eprintln!("- {:?}", cause);
+            // }
         }
     }
 }

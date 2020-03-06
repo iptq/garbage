@@ -169,7 +169,8 @@ impl DeletionStrategy {
         let (trash_dir, requires_copy) = self.get_target_trash();
 
         // prompt if not suppressed
-        if !options.force {
+        // TODO: streamline this logic better
+        if !options.force && (requires_copy || options.prompt) {
             // TODO: actually handle prompting instead of manually flushing
             if requires_copy {
                 eprint!(

@@ -68,6 +68,16 @@ impl TrashDir {
         Ok(target)
     }
 
+    /// Get the `info` directory
+    pub fn check_info_dir(&self) -> Result<Option<PathBuf>, Error> {
+        let target = self.0.join("info");
+        if !target.exists() {
+            Ok(None)
+        } else {
+            Ok(Some(target))
+        }
+    }
+
     /// Iterate over trash infos within this trash directory
     pub fn iter(&self) -> Result<TrashDirIter, Error> {
         let iter = WalkDir::new(&self.info_dir()?)
