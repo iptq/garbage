@@ -2,10 +2,11 @@ garbage
 =======
 
 [![crates.io](https://img.shields.io/crates/v/garbage.svg)](https://crates.io/crates/garbage)
+[![dependency status](https://deps.rs/repo/github/iptq/garbage/status.svg)](https://deps.rs/repo/github/iptq/garbage)
 
-rust ver of trash-cli, basic functionality is in, code is probably shit (edit: hopefully less shit now)
+Rust ver of trash-cli.
 
-* **Windows Recycle Bin not supported**
+* **Windows/Recycle Bin not supported**
 
 Installation
 ------------
@@ -17,8 +18,10 @@ cargo install garbage
 Usage
 -----
 
+Run `garbage --help` to understand how it's used!
+
 ```
-$ garbage put [-r] file1 file2 ...
+$ garbage put file1 file2 ...
 
 $ garbage restore
 [..interactive]
@@ -31,15 +34,15 @@ $ garbage empty [days]
 If you use a bash-ish shell, feel free to add this to your shell's rc file:
 
 ```sh
-alias rm='$HOME/.cargo/bin/garbage put' # or wherever garbage is
+alias rm='garbage put' # Make sure garbage is in your path
 ```
 
 Features
 --------
 
 - [x] Put
-- [ ] List
-- [ ] Restore (need to fuck around with DeletionStrategy)
+- [x] List
+- [x] Restore
 - [ ] Tests...
 
 Spec Compliance
