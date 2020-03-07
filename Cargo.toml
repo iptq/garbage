@@ -6,6 +6,10 @@ description = "cli tool for interacting with the freedesktop trashcan"
 license = "MIT"
 edition = "2018"
 
+[profile.release]
+lto = true
+panic = "abort"
+
 [[bin]]
 name = "garbage"
 path = "src/main.rs"
@@ -13,12 +17,10 @@ path = "src/main.rs"
 [dependencies]
 anyhow = "1.0"
 chrono = "0.4"
-env_logger = "0.7"
 lazy_static = "1.0"
 libc = "0.2"
 libmount = "0.1"
 log = "0.4"
-regex = "1.1"
 structopt = "0.3"
 thiserror = "1.0"
 walkdir = "2.2"

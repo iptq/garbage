@@ -3,15 +3,22 @@ use std::io::{self, BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 
 use chrono::{DateTime, Local, TimeZone};
-use regex::Regex;
 
 use crate::errors::{Error, TrashInfoError};
 
-lazy_static! {
-    static ref KEY_VALUE_PATTERN: Regex = Regex::new(r"([A-Za-z]+)\s*=\s*(.*)").unwrap();
-}
-
 const DATE_FORMAT: &str = "%Y-%m-%dT%H:%M:%S";
+
+fn parse_key_value(line: &str) -> Option<(&str, &str)> {
+    let mut parts = line.split('=').peekable();
+    let key = if let Some(key) = parts.next() {
+        key
+    } else {
+        return None;
+    };
+
+    let value = &line[key.len() + 1..];
+    Some((key, value))
+}
 
 /// .trashinfo Data
 #[derive(Debug)]
@@ -49,30 +56,28 @@ impl TrashInfo {
             let line = line?;
 
             // first line must be "[Trash Info]"
-            if i == 0 && line != "[Trash Info]" {
-                return Err(Error::BadTrashInfo(TrashInfoError::MissingHeader));
+            if i == 0 {
+                if line != "[Trash Info]" {
+                    return Err(Error::BadTrashInfo(TrashInfoError::MissingHeader));
+                } else {
+                    continue;
+                }
             }
 
-            // look for path and deletion date
-            let captures = match KEY_VALUE_PATTERN.captures(&line) {
-                Some(captures) => captures,
-                None => continue,
-            };
-
-            // safe to unwrap because the parser confirmed their existence
-            let key = captures.get(1).unwrap().as_str();
-            let value = captures.get(2).unwrap().as_str();
-
-            match key {
-                "Path" => {
-                    let value = PathBuf::from(value);
-                    path = Some(value)
+            if let Some((key, value)) = parse_key_value(&line) {
+                match key {
+                    "Path" => {
+                        let value = PathBuf::from(value);
+                        path = Some(value)
+                    }
+                    "DeletionDate" => {
+                        let date = Local.datetime_from_str(value, DATE_FORMAT)?;
+                        deletion_date = Some(date)
+                    }
+                    _ => continue,
                 }
-                "DeletionDate" => {
-                    let date = Local.datetime_from_str(value, DATE_FORMAT)?;
-                    deletion_date = Some(date)
-                }
-                _ => continue,
+            } else {
+                continue;
             }
         }
 

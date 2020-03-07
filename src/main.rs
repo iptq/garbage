@@ -2,9 +2,14 @@
 
 extern crate anyhow;
 
+use std::alloc::System;
+
 use anyhow::Result;
 use garbage::ops::{self, EmptyOptions, ListOptions, PutOptions, RestoreOptions};
 use structopt::StructOpt;
+
+#[global_allocator]
+static A: System = System;
 
 #[derive(StructOpt)]
 enum Command {
@@ -40,8 +45,6 @@ fn run() -> Result<()> {
 }
 
 fn main() {
-    env_logger::init();
-
     match run() {
         Ok(_) => (),
         Err(err) => {
