@@ -1,6 +1,6 @@
 [package]
 name = "garbage"
-version = "0.2.0-rc2"
+version = "0.2.0-rc3"
 authors = ["Michael Zhang <iptq@protonmail.com>"]
 description = "cli tool for interacting with the freedesktop trashcan"
 license = "MIT"
