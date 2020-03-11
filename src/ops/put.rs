@@ -66,8 +66,9 @@ pub fn put(options: PutOptions) -> Result<()> {
         // don't allow deleting '.' or '..'
         let current_dir = env::current_dir()?;
         ensure!(
-            !(path.as_path() == current_dir.as_path()
-                || (current_dir.parent().is_some() && path == current_dir.parent().unwrap())),
+            !(utils::into_absolute(&path)? == current_dir.as_path()
+                || (current_dir.parent().is_some()
+                    && utils::into_absolute(&path)? == current_dir.parent().unwrap())),
             Error::CannotTrashDotDirs
         );
 
