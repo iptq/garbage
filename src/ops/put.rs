@@ -13,9 +13,6 @@ use crate::{HOME_MOUNT, MOUNTS};
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("File {0} doesn't exist.")]
-    FileDoesntExist(PathBuf),
-
     #[error("Refusing to remove directory {0} without '-r' option")]
     MissingRecursiveOption(PathBuf),
 
@@ -26,6 +23,7 @@ pub enum Error {
     CancelledByUser,
 }
 
+/// Options to pass to put
 #[derive(StructOpt)]
 pub struct PutOptions {
     /// The target path to be trashed
@@ -156,11 +154,6 @@ impl DeletionStrategy {
 
         // this will be None if target isn't a symlink
         let link_info = target.read_link().ok();
-
-        // file doesn't exist
-        if !target.exists() {
-            bail!(Error::FileDoesntExist(target.to_path_buf()));
-        }
 
         // file is a directory
         if !link_info.is_some() && target.is_dir() && !options.recursive {
