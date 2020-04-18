@@ -38,9 +38,9 @@ pub struct PutOptions {
     #[structopt(long = "prompt", short = "i")]
     prompt: bool,
 
-    /// Trashes directories recursively
+    /// Trashes directories recursively (ignored)
     #[structopt(long = "recursive", short = "r")]
-    recursive: bool,
+    _recursive: bool,
 
     /// Suppress prompts/messages
     #[structopt(long = "force", short = "f")]
@@ -156,9 +156,9 @@ impl DeletionStrategy {
         let link_info = target.read_link().ok();
 
         // file is a directory
-        if !link_info.is_some() && target.is_dir() && !options.recursive {
-            bail!(Error::MissingRecursiveOption(target.to_path_buf()));
-        }
+        // if !link_info.is_some() && target.is_dir() && !options.recursive {
+        //     bail!(Error::MissingRecursiveOption(target.to_path_buf()));
+        // }
 
         let (trash_dir, requires_copy) = self.get_target_trash();
 
