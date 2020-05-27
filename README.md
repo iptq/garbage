@@ -1,4 +1,4 @@
 garbage
 =======
 
-Moved to [source](https://git.sr.ht/~iptq/garbage).
+Moved to [sourcehut](https://git.sr.ht/~iptq/garbage).
